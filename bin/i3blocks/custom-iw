@@ -1,0 +1,47 @@
+#!/bin/sh
+# Copyright (C) 2014 Julien Bonjean <julien@bonjean.info>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+INTERFACE="${BLOCK_INSTANCE:=wlp2s0}"
+
+QUALITY=$(grep $INTERFACE /proc/net/wireless | awk '{ print int($3 * 100 / 70) }')
+
+iw dev $INTERFACE link | awk -v quality=$QUALITY '
+/SSID:/ {
+	ssid=$2
+}
+/tx bitrate:/ {
+	bitrate=$3
+}
+END {
+	# full text
+	#if (type == "swap")
+	#	printf("%.1fG/%.1fG\n", (swap_total-swap_free)/1024/1024, swap_total/1024/1024)
+	#else
+	#	printf("%.1fG/%.1fG\n", (mem_total-mem_free)/1024/1024, mem_total/1024/1024)
+
+	# TODO: short text
+
+	# TODO: color (if less than X%)
+
+        if (ssid == "") {
+            print "OFF\n";
+	    print "#FF0000\n";
+	    exit(33);
+	}
+        else
+            printf("%s %.1f%\n", ssid, quality)
+}
+'

@@ -1,0 +1,15 @@
+#!/bin/bash
+
+ping -c 1 -W 2 8.8.8.8 | grep 'rtt min/avg/max/mdev = ' | awk 'BEGIN { FS="/"; }
+END {
+    #print $5
+    #printf("%.1f ms\n", $5)
+    if ($5 == "") {
+	print "OFF\n";
+	print "#FF0000\n";
+	exit(33);
+    }
+    else
+	printf("%.1fms\n", $5)
+}
+'
